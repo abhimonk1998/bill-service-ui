@@ -3,18 +3,37 @@ import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import ImageUpload from "./components/ImageUpload";
 import PersonList from "./components/PersonList";
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3"; // ES Modules import
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+const client = new S3Client({
+  region: "us-east-2",
+  credentials: {
+    accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
+  },
+});
+
+async function getObjectURL(bucket, key) {
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+  });
+  const url = await getSignedUrl(client, command);
+  return url;
+}
+
+async function wrapperGetUrl(bucket, key) {
+  return await getObjectURL(bucket, key);
+}
 
 function App() {
   const [image, setImage] = useState(null);
   const [persons, setPersons] = useState([]);
-
-  const handleImageUpload = (uploadedImage) => {
-    setImage(URL.createObjectURL(uploadedImage));
-  };
-
-  const handlePersonsChange = (updatedPersons) => {
-    setPersons(updatedPersons);
-  };
 
   return (
     <Container>
@@ -25,10 +44,10 @@ function App() {
       </Row>
       <Row className="mt-3">
         <Col md={6}>
-          <ImageUpload onImageUpload={handleImageUpload} />
+          <ImageUpload />
         </Col>
         <Col md={6}>
-          <PersonList onPersonsChange={handlePersonsChange} />
+          <PersonList />
         </Col>
       </Row>
       {image && (
