@@ -3,11 +3,7 @@ import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import ImageUpload from "./components/ImageUpload";
 import PersonList from "./components/PersonList";
-import {
-  S3Client,
-  GetObjectCommand,
-  PutObjectCommand,
-} from "@aws-sdk/client-s3"; // ES Modules import
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3"; // ES Modules import
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const client = new S3Client({
